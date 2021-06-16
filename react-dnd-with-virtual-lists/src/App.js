@@ -7,6 +7,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import Typography from '@material-ui/core/Typography';
 
 import { FixedSizeList } from 'react-window';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 
 const countries = require('country-list');
@@ -23,42 +24,101 @@ const App = () => {
     setAllCountries(suggestedCountries);
   };
 
-  const CountryItem = ({index, style}) => (
-    <Typography variant="subtitle1" key={uuidv4()} style={style}>
-      <div className="droppable-list-item">
-        {allCountries[index]}
-      </div>
-    </Typography>
-  );
+  const CountryItem = ({index, style}) => {
+    const country = allCountries[index];
+    return (
+      <Draggable key={uuidv4()} draggableId={country} index={index}>
+        {
+          provided => (
+            <div
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
+              ref={provided.innerRef}
+              key={uuidv4()}
+              style={{
+                ...style,
+                // border: draggableCountry === country ? '3px solid black' : '1px solid lightgrey',
+                width: '93%',
+              }}
+              className="droppable-list-item"
+            >
+              <Typography variant="subtitle1">
+                  {country}
+              </Typography>
+            </div>
+          )
+        }
+      </Draggable>
+    );
+  }
+
+  const onDragUpdate = event => {
+    console.log("On Update Event: ", event);
+  };
+
+  const onDragEnd = event => {
+    console.log("On End Event: ", event);
+  };
+
   return (
     <div className="container">
       <div className="search-input">
         <TextField autoFocus onSelect={suggestCountry} placeholder="Search"/>
       </div>
       <div className="drag-and-drop-container">
-        <div className="draggable-countries-container">
-          <List>
-            {
-              cities.map(city => (
-                <ListItem key={uuidv4()}>
-                  <Typography variant="subtitle1" className="draggable-list-item" >
-                    {city}
-                  </Typography>
-                </ListItem>
-              ))
-            }
-          </List>
-        </div>
-        <div className="droppable-countries-container">
-          <FixedSizeList
-            style={{overflowX: "hidden"}}
-            height={600}
-            itemCount={allCountries.length}
-            itemSize={50}
-          >
-            {CountryItem}
-          </FixedSizeList>
-        </div>
+        <DragDropContext onDragEnd={onDragEnd} onDragUpdate={onDragUpdate}>
+
+          <div className="draggable-countries-container">
+            <Droppable droppableId="cities-list">
+              {
+                provided => (
+                  <List ref={provided.innerRef}>
+                    {
+                      cities.map((city, index) => (
+                        <Draggable key={uuidv4()} draggableId={city} index={index}>
+                          {
+                            provided => (
+                              <ListItem
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                ref={provided.innerRef}
+                                key={uuidv4()}
+                              >
+                                <Typography variant="subtitle1" className="draggable-list-item">
+                                  {city}
+                                </Typography>
+                              </ListItem>
+                            )
+                          }
+                        </Draggable>
+                      ))
+                    }
+                    {provided.placeholder}
+                  </List>
+                )
+              }
+            </Droppable>
+          </div>
+          <div className="droppable-countries-container">
+            <Droppable droppableId="countries-list">
+              {
+                provided => (
+                  <div ref={provided.innerRef} {...provided.droppableProps}>
+                    <FixedSizeList
+                      style={{overflowX: "hidden"}}
+                      height={600}
+                      itemCount={allCountries.length}
+                      itemSize={50}
+                    >
+                      {CountryItem}
+                    </FixedSizeList>
+                  </div>
+                )
+              }
+            </Droppable>
+          </div>
+
+        </DragDropContext>
       </div>
     </div>
   );
