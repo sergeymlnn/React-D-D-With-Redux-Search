@@ -19,12 +19,12 @@ const App = () => {
   const [allCountries, setAllCountries] = useState([...countriesList]);
   const suggestCountry = event => {
     const suggestedCountries = countriesList.filter(
-      country => country.toLowerCase().includes(event.target.value)
+      country => country.toLowerCase().includes(event.target.value.toLowerCase())
     );
     setAllCountries(suggestedCountries);
   };
 
-  const CountryItem = ({index, style}) => {
+  const CountryItem = ({ index, style }) => {
     const country = allCountries[index];
     return (
       <Draggable key={uuidv4()} draggableId={country} index={index}>
