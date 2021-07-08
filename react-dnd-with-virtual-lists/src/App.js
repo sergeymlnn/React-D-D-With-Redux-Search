@@ -11,15 +11,17 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 
 const countries = require('country-list');
-const countriesList = countries.getNames();
 const cities = ["London", "Madrid", "Berlin", "Milan", "Paris", "Kyiv", "Lviv"];
 
 
 const App = () => {
-  const [allCountries, setAllCountries] = useState([...countriesList]);
+  const [allCountries, setAllCountries] = useState(countries.getNames());
+  const [draggableCountry, setDraggableCountry] = useState(null);
+
   const suggestCountry = event => {
-    const suggestedCountries = countriesList.filter(
-      country => country.toLowerCase().includes(event.target.value.toLowerCase())
+    const suggestedCountry = event.target.value.toLowerCase();
+    const suggestedCountries = allCountries.filter(
+      country => country.toLowerCase().includes(suggestedCountry)
     );
     setAllCountries(suggestedCountries);
   };
@@ -40,7 +42,7 @@ const App = () => {
               key={uuidv4()}
               style={{
                 ...style,
-                // border: draggableCountry === country ? '3px solid black' : '1px solid lightgrey',
+                border: draggableCountry === country ? '3px solid black' : '1px solid lightgrey',
                 width: '93%',
               }}
               className="droppable-list-item"
@@ -61,7 +63,9 @@ const App = () => {
     if (!countryIndex) {
       return;
     }
-    console.log("YOUR CONTRY IS: ", allCountries[countryIndex]);
+    const country = allCountries[countryIndex];
+    setDraggableCountry(country);
+    console.log("YOUR COUNTRY IS: ", draggableCountry);
   };
 
   const onDragEnd = event => {
