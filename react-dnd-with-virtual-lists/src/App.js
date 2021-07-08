@@ -26,6 +26,9 @@ const App = () => {
 
   const CountryItem = ({ index, style }) => {
     const country = allCountries[index];
+    if (!country) {
+      return;
+    }
     return (
       <Draggable key={uuidv4()} draggableId={country} index={index}>
         {
@@ -112,6 +115,7 @@ const App = () => {
                     >
                       {CountryItem}
                     </FixedSizeList>
+                    {provided.placeholder}
                   </div>
                 )
               }
