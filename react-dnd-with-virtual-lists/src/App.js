@@ -15,22 +15,6 @@ const countriesList = countries.getNames();
 const cities = ["London", "Madrid", "Berlin", "Milan", "Paris", "Kyiv", "Lviv"];
 
 
-const getRenderItem = countries => (provided, snapshot, rubric) => {
-  return (
-    <div
-      {...provided.draggableProps}
-      {...provided.dragHandleProps}
-      ref={provided.innerRef}
-      className="droppable-list-item"
-      >
-      <Typography variant="subtitle1">
-          {countries[rubric.source.index]}
-      </Typography>
-    </div>
-  );
-};
-
-
 const App = () => {
   const [allCountries, setAllCountries] = useState([...countriesList]);
   const suggestCountry = event => {
@@ -39,8 +23,6 @@ const App = () => {
     );
     setAllCountries(suggestedCountries);
   };
-
-  const renderItem = getRenderItem(allCountries);
 
   const CountryItem = ({ index, style }) => {
     const country = allCountries[index];
@@ -71,15 +53,15 @@ const App = () => {
         }
       </Draggable>
     );
-  }
+  };
 
   const onDragUpdate = event => {
-    console.log("On Update Event: ", event);
+    // console.log("On Update Event: ", event);
     const countryIndex = event.destination?.index;
-    if(!countryIndex) {
+    if (!countryIndex) {
       return;
     }
-    console.log("COUNTRY: ", allCountries[countryIndex])
+    console.log("YOUR CONTRY IS: ", allCountries[countryIndex]);
   };
 
   const onDragEnd = event => {
@@ -126,16 +108,18 @@ const App = () => {
             </Droppable>
           </div>
           <div className="droppable-countries-container">
-            <Droppable droppableId="countries-list" renderClone={renderItem} mode="virtual">
+            <Droppable droppableId="countries-list">
               {
-                (provided, snapshot) => (
+                provided => (
                   <div ref={provided.innerRef} {...provided.droppableProps}>
-                    {
-                    allCountries.map((item, index)  => (
-                      <Draggable draggableId={index.toString()} index={index} key={index}>
-                        {renderItem}
-                      </Draggable>
-                    ))}
+                    <FixedSizeList
+                      style={{overflowX: "hidden"}}
+                      height={600}
+                      itemCount={allCountries.length}
+                      itemSize={50}
+                    >
+                      {CountryItem}
+                    </FixedSizeList>
                     {provided.placeholder}
                   </div>
                 )
